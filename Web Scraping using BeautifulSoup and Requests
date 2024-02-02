@@ -1,0 +1,38 @@
+from bs4 import BeautifulSoup
+import requests
+
+url = r'https://www.worldometers.info/population/largest-cities-in-the-world/'
+
+page = requests.get(url)
+
+soup = BeautifulSoup(page.text, 'html')
+
+print(soup)
+
+table = soup.find('table')
+
+header = table.find('thead')
+header
+
+headerT = header.find_all('td')
+
+titleHead = [head.text.strip() for head in headerT]
+print(titleHead)
+
+import pandas as pd
+
+df = pd.DataFrame(columns = titleHead)
+df
+
+tableR = table.find_all('tr')
+
+for row in tableR[1:]:
+    rowData = row.find_all('td')
+    individualData = [data.text.strip() for data in rowData]
+    print(individualData)
+    
+    length = len(df)
+    df.loc[length] = individualData
+
+df.to_csv(r'C:\Users\Lenovo\Documents\Akil assignment\PROJECTS\OUTPUT\LargestCityData.csv', index = False)
+
