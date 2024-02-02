@@ -1,0 +1,39 @@
+from bs4 import BeautifulSoup
+import requests
+
+url = 'https://www.worldometers.info/geography/largest-countries-in-the-world/'
+
+page = requests.get(url)
+
+soup = BeautifulSoup(page.text, 'html')
+
+print(soup.prettify())
+
+table = soup.find('table')
+
+print(table) 
+
+titles = table.find_all('th')
+titles
+
+table_title = [title.text.strip() for title in titles]
+print(table_title)
+
+import pandas as pd
+
+df = pd.DataFrame(columns = table_title)
+df
+
+columnData = table.find_all('tr')
+
+for row in columnData[1:]:
+    rowData = row.find_all('td')
+    individualData = [data.text.strip() for data in rowData]
+    
+    length = len(df)
+    
+    df.loc[length] = individualData
+    
+df.to_csv(r'C:\Users\Lenovo\Documents\Akil assignment\PROJECTS\OUTPUT\Countries.csv', index = False)
+
+
