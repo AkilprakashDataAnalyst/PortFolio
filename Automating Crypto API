@@ -1,0 +1,119 @@
+from requests import Request, Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
+
+url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+parameters = {
+  'start':'1',
+  'limit':'15',
+  'convert':'USD'
+}
+headers = {
+  'Accepts': 'application/json',
+  'X-CMC_PRO_API_KEY': 'adc5166e-66ad-4f72-bde0-5c7f63ad798c',
+}
+
+session = Session()
+session.headers.update(headers)
+
+try:
+  response = session.get(url, params=parameters)
+  data = json.loads(response.text)
+  print(data)
+except (ConnectionError, Timeout, TooManyRedirects) as e:
+  print(e)
+
+type(data)
+
+import pandas as pd
+
+pd.set_option('display.max.column',None)
+pd.set_option('display.max.row',None)
+
+df = pd.json_normalize(data['data'])
+df['timestamp']= pd.to_datetime('now')
+df
+
+def api_runner():
+    global df
+    from requests import Request, Session
+    from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+    import json
+
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+    parameters = {
+      'start':'1',
+      'limit':'15',
+      'convert':'USD'
+    }
+    headers = {
+      'Accepts': 'application/json',
+      'X-CMC_PRO_API_KEY': 'adc5166e-66ad-4f72-bde0-5c7f63ad798c',
+    }
+
+    session = Session()
+    session.headers.update(headers)
+
+    try:
+      response = session.get(url, params=parameters)
+      data = json.loads(response.text)
+      #print(data)
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+      print(e)
+    
+    df = pd.json_normalize(data['data'])
+    df['timestamp']= pd.to_datetime('now')
+    df 
+    
+    if not os.path.isfile(r"C:\Users\Lenovo\Documents\Akil assignment\PROJECTS\AutomativeCrypto.csv"):
+        df.to_csv(r"C:\Users\Lenovo\Documents\Akil assignment\PROJECTS\AutomativeCrypto.csv", header = 'column_names')
+    else:
+        df.to_csv(r"C:\Users\Lenovo\Documents\Akil assignment\PROJECTS\AutomativeCrypto.csv", header=False, mode='a')
+    
+
+import os
+from time import time
+from time import sleep
+
+for i in range(333):
+    api_runner()
+    print("API Runner Completed Successfully")
+    sleep(60)
+exit()
+
+
+df123 = pd.read_csv(r"C:\Users\Lenovo\Documents\Akil assignment\PROJECTS\AutomativeCrypto.csv")
+df123
+
+pd.set_option('display.float_format', lambda x: '%.2f' %x)
+df
+
+df3 = df.groupby('name')[['quote.USD.percent_change_1h','quote.USD.percent_change_24h','quote.USD.percent_change_7d','quote.USD.percent_change_30d','quote.USD.percent_change_60d','quote.USD.percent_change_90d']].mean()
+df3
+
+df4 = df3.stack()
+df4
+
+type(df4)
+
+df5 = df4.to_frame(name = 'range')
+df5
+
+df4.count()
+
+index = pd.Index(range(df4.count()))
+
+df6 = df5.set_index(index)
+df6 = df5.reset_index()
+df6
+
+df7 = df6.rename(columns={'level_1':'percent_change'})
+df7
+
+df7['percent_change'] = df7['percent_change'].replace(['quote.USD.percent_change_1h','quote.USD.percent_change_24h','quote.USD.percent_change_7d','quote.USD.percent_change_30d','quote.USD.percent_change_60d','quote.USD.percent_change_90d'],['1h','24h','7d','30d','60d','90d'])
+df7
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.catplot(x='percent_change', y='range', hue='name', data=df7, height=5, aspect=1,kind='point', row= 'name')
